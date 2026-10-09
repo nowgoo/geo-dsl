@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+<polygon points="48,265.817931 352,265.817931 124,134.182069" fill="none" stroke="none"/>
+<polygon points="48,265.817931 352,265.817931 124,134.182069" fill="none" stroke="#222222" stroke-width="2"/>
+<circle cx="48" cy="265.817931" r="4" fill="#222222"/>
+<circle cx="352" cy="265.817931" r="4" fill="#222222"/>
+<circle cx="124" cy="134.182069" r="4" fill="#222222"/>
+<path d="M 120 141.110273 L 126.928203 145.110273 L 130.928203 138.182069" stroke="#222222" stroke-width="1.5" fill="none"/>
+<text x="56" y="257.817931" font-family="serif" font-style="italic" font-size="14" fill="#222222">A</text>
+<text x="360" y="257.817931" font-family="serif" font-style="italic" font-size="14" fill="#222222">B</text>
+<text x="132" y="126.182069" font-family="serif" font-style="italic" font-size="14" fill="#222222">C</text>
+</svg>

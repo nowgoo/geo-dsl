@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+<polygon points="40,525 760,525 310,75" fill="none" stroke="none"/>
+<line x1="40" y1="525" x2="535" y2="300" stroke="#222222" stroke-width="2"/>
+<line x1="760" y1="525" x2="175" y2="300" stroke="#222222" stroke-width="2"/>
+<line x1="310" y1="75" x2="400" y2="525" stroke="#222222" stroke-width="2"/>
+<polygon points="40,525 760,525 310,75" fill="none" stroke="#222222" stroke-width="2"/>
+<circle cx="40" cy="525" r="4" fill="#222222"/>
+<circle cx="760" cy="525" r="4" fill="#222222"/>
+<circle cx="310" cy="75" r="4" fill="#222222"/>
+<circle cx="535" cy="300" r="4" fill="#222222"/>
+<circle cx="175" cy="300" r="4" fill="#222222"/>
+<circle cx="400" cy="525" r="4" fill="#222222"/>
+<circle cx="370" cy="375" r="4" fill="#222222"/>
+<path d="M 220 521 L 220 529" stroke="#222222" stroke-width="1.5" fill="none"/><path d="M 580 521 L 580 529" stroke="#222222" stroke-width="1.5" fill="none"/>
+<path d="M 644.671573 415.328427 L 650.328427 409.671573" stroke="#222222" stroke-width="1.5" fill="none"/><path d="M 419.671573 190.328427 L 425.328427 184.671573" stroke="#222222" stroke-width="1.5" fill="none"/>
+<path d="M 245.929972 189.557983 L 239.070028 185.442017" stroke="#222222" stroke-width="1.5" fill="none"/><path d="M 110.929972 414.557983 L 104.070028 410.442017" stroke="#222222" stroke-width="1.5" fill="none"/>
+<text x="48" y="517" font-family="serif" font-style="italic" font-size="14" fill="#222222">A</text>
+<text x="768" y="517" font-family="serif" font-style="italic" font-size="14" fill="#222222">B</text>
+<text x="318" y="67" font-family="serif" font-style="italic" font-size="14" fill="#222222">C</text>
+<text x="543" y="292" font-family="serif" font-style="italic" font-size="14" fill="#222222">D</text>
+<text x="183" y="292" font-family="serif" font-style="italic" font-size="14" fill="#222222">E</text>
+<text x="408" y="517" font-family="serif" font-style="italic" font-size="14" fill="#222222">F</text>
+<text x="378" y="367" font-family="serif" font-style="italic" font-size="14" fill="#222222">G</text>
+</svg>

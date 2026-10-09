@@ -1,0 +1,17 @@
+{
+  "name": "geometry-dsl",
+  "version": "0.1.0",
+  "description": "A declarative DSL for 2D geometry diagrams that compiles to SVG",
+  "type": "module",
+  "bin": {
+    "geometry": "./cli/geometry.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "cli": "node ./cli/geometry.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}

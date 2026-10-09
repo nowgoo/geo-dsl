@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="440" viewBox="0 0 440 440">
+<polygon points="48,48.000001 391.999999,48.000001 392,391.999999 48.000003,391.999999" fill="none" stroke="none"/>
+<polygon points="48,48.000001 391.999999,48.000001 392,391.999999 48.000003,391.999999" fill="none" stroke="#222222" stroke-width="2"/>
+<circle cx="48" cy="48.000001" r="4" fill="#222222"/>
+<circle cx="391.999999" cy="48.000001" r="4" fill="#222222"/>
+<circle cx="392" cy="391.999999" r="4" fill="#222222"/>
+<circle cx="48.000003" cy="391.999999" r="4" fill="#222222"/>
+<path d="M 383.999999 48.000001 L 383.999999 56.000001 L 391.999999 56.000001" stroke="#222222" stroke-width="1.5" fill="none"/>
+<path d="M 220 44.000001 L 220 52.000001" stroke="#222222" stroke-width="1.5" fill="none"/><path d="M 396 220 L 388 220" stroke="#222222" stroke-width="1.5" fill="none"/>
+<text x="56" y="40.000001" font-family="serif" font-style="italic" font-size="14" fill="#222222">A</text>
+<text x="399.999999" y="40.000001" font-family="serif" font-style="italic" font-size="14" fill="#222222">B</text>
+<text x="400" y="383.999999" font-family="serif" font-style="italic" font-size="14" fill="#222222">C</text>
+<text x="56.000003" y="383.999999" font-family="serif" font-style="italic" font-size="14" fill="#222222">D</text>
+</svg>
