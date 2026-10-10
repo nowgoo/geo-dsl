@@ -34,6 +34,7 @@ label G
 node ./cli/geometry.js render examples/right_triangle.geo          # SVG 输出到 stdout
 node ./cli/geometry.js render examples/right_triangle.geo -o out.svg
 node ./cli/geometry.js render example.geo --width 1200 --height 800 --padding 50
+node ./cli/geometry.js render example.geo --interactive            # 交互式 SVG（拖拽/hover/选中）
 ```
 
 作为库使用：
@@ -45,7 +46,8 @@ const document = compile(source);   // 分析 + 求值 + 布局
 const svg = renderSVG(document);
 ```
 
-分层 API：`lex`、`parse`、`analyze`、`compile`、`renderSVG`。
+分层 API：`lex`、`parse`、`analyze`、`compile`、`renderSVG`、`serializeDocument`、
+`mount`/`mountAll`（交互运行时）。
 
 ## 语言一览
 
@@ -83,6 +85,9 @@ const svg = renderSVG(document);
 - 渲染器只消费几何 IR；从不解析 DSL，也不计算几何。
 - 输出确定性：相同输入 → 字节级相同的 SVG（金样测试）。
 - 零运行时依赖；Node ≥ 22；核心库可在浏览器运行（仅 `cli/` 使用 fs）。
+- **交互式 SVG（v0.3）**：opt-in 渲染选项；静态输出字节不变。拖拽自由点
+  后浏览器端复用 `evaluate()`/`layout()` 纯函数重算全图；详见
+  [docs/spec_v0.3.md](docs/spec_v0.3.md)。
 
 ## 错误
 

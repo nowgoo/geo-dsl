@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="geo-interactive" width="600" height="400" viewBox="0 0 600 400">
+<g class="geo-scene">
+<g class="geo-obj" data-geo-name="ABC" data-geo-kind="Polygon"><title>ABC · polygon (3 vertices)</title><polygon points="129.237006,256.920998 470.762994,256.920998 243.079002,29.237006" fill="none" stroke="none"/></g>
+<g class="geo-obj" data-geo-name="omega" data-geo-kind="Circle"><title>omega · radius 3.162278</title><circle cx="300" cy="200" r="180" fill="none" stroke="#555555" stroke-width="2"/></g>
+<g class="geo-obj" data-geo-name="ABC" data-geo-kind="Polygon"><title>ABC · polygon (3 vertices)</title><polygon points="129.237006,256.920998 470.762994,256.920998 243.079002,29.237006" fill="none" stroke="#222222" stroke-width="2"/></g>
+<g class="geo-obj" data-geo-name="A" data-geo-kind="Point"><title>A (0, 0)</title><circle cx="129.237006" cy="256.920998" r="4" fill="#222222"/></g>
+<g class="geo-obj" data-geo-name="B" data-geo-kind="Point"><title>B (6, 0)</title><circle cx="470.762994" cy="256.920998" r="4" fill="#222222"/></g>
+<g class="geo-obj" data-geo-name="C" data-geo-kind="Point"><title>C (2, 4)</title><circle cx="243.079002" cy="29.237006" r="4" fill="#222222"/></g>
+<g class="geo-obj" data-geo-name="O" data-geo-kind="Point"><title>O (3, 1)</title><circle cx="300" cy="200" r="4" fill="#222222"/></g>
+<g data-geo-label="A"><text x="137.237006" y="248.920998" font-family="serif" font-style="italic" font-size="14" fill="#222222">A</text></g>
+<g data-geo-label="B"><text x="478.762994" y="248.920998" font-family="serif" font-style="italic" font-size="14" fill="#222222">B</text></g>
+<g data-geo-label="C"><text x="251.079002" y="21.237006" font-family="serif" font-style="italic" font-size="14" fill="#222222">C</text></g>
+<g data-geo-label="O"><text x="308" y="192" font-family="serif" font-style="italic" font-size="14" fill="#222222">O</text></g>
+</g>
+<style>
+.geo-interactive{touch-action:none;user-select:none}
+.geo-obj{cursor:pointer}
+.geo-obj[data-geo-kind="Point"]{cursor:grab}
+.geo-interactive.is-dragging .geo-obj[data-geo-kind="Point"]{cursor:grabbing}
+.geo-obj:hover{filter:drop-shadow(0 0 3px #4a90d9)}
+.geo-obj.is-selected{filter:drop-shadow(0 0 4px #4a90d9)}
+g[data-geo-label]{cursor:move}
+.geo-interactive.is-error .geo-scene{filter:drop-shadow(0 0 4px #d94a4a)}
+</style>
+<script type="application/json" class="geo-payload">{"version":1,"mode":"free","canvas":{"width":600,"height":400,"padding":20},"transform":{"scale":56.920997883030815,"ox":129.23700635090754,"oy":256.92099788303085},"objects":[{"name":"A","kind":"Point","definition":{"type":"PointLiteralDefinition","x":{"type":"NumberExpr","value":0},"y":{"type":"NumberExpr","value":0}},"dependencies":[],"draggable":true,"unknown":false,"solved":null},{"name":"B","kind":"Point","definition":{"type":"PointLiteralDefinition","x":{"type":"NumberExpr","value":6},"y":{"type":"NumberExpr","value":0}},"dependencies":[],"draggable":true,"unknown":false,"solved":null},{"name":"C","kind":"Point","definition":{"type":"PointLiteralDefinition","x":{"type":"NumberExpr","value":2},"y":{"type":"NumberExpr","value":4}},"dependencies":[],"draggable":true,"unknown":false,"solved":null},{"name":"ABC","kind":"Polygon","definition":{"type":"PolygonDefinition","points":[{"type":"RefDefinition","name":"A"},{"type":"RefDefinition","name":"B"},{"type":"RefDefinition","name":"C"}]},"dependencies":["A","B","C"],"draggable":false,"unknown":false,"solved":null},{"name":"O","kind":"Point","definition":{"type":"CircumcenterDefinition","polygon":{"type":"PolygonDefinition","points":[{"type":"RefDefinition","name":"A"},{"type":"RefDefinition","name":"B"},{"type":"RefDefinition","name":"C"}]}},"dependencies":["A","B","C"],"draggable":false,"unknown":false,"solved":null},{"name":"omega","kind":"Circle","definition":{"type":"CircumcircleDefinition","polygon":{"type":"PolygonDefinition","points":[{"type":"RefDefinition","name":"A"},{"type":"RefDefinition","name":"B"},{"type":"RefDefinition","name":"C"}]}},"dependencies":["A","B","C"],"draggable":false,"unknown":false,"solved":null}],"styles":{"omega":[[["stroke","#555555"],["fill","none"],["width",2]]]},"labels":[{"target":"A","text":"A","offset":{"x":8,"y":-8}},{"target":"B","text":"B","offset":{"x":8,"y":-8}},{"target":"C","text":"C","offset":{"x":8,"y":-8}},{"target":"O","text":"O","offset":{"x":8,"y":-8}}],"marks":[],"constraints":[]}</script>
+<script type="module" class="geo-bootstrap">import { mountAll } from "./geometry-dsl-runtime.js";
+mountAll(document);</script>
+</svg>

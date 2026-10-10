@@ -110,6 +110,17 @@ function unionBounds(list) {
     return { minX, minY, maxX, maxY };
 }
 
+/**
+ * screen point -> world point: exact inverse of the §41 transform
+ * (spec_v0.3 §6). Same Y-flip point mirrored.
+ */
+export function toWorld(transform, s) {
+    return {
+        x: (s.x - transform.ox) / transform.scale,
+        y: (transform.oy - s.y) / transform.scale,
+    };
+}
+
 /** world-coordinate rectangle currently visible on the canvas */
 function visibleWorldRect(document) {
     const { scale, ox, oy } = document.transform;

@@ -7,15 +7,23 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { compile, renderSVG, formatError } from "../src/index.js";
+import { compile, renderSVG, formatError, DEFAULT_RUNTIME_URL } from "../src/index.js";
 
 const USAGE = `geometry render input.geo [-o output.svg] [--width N] [--height N] [--padding N]
+                           [--interactive] [--runtime-url URL]
 
 Options:
   -o, --output <file>   write SVG to file instead of stdout
   --width <n>           override canvas width
   --height <n>          override canvas height
   --padding <n>         override canvas padding
+  --interactive         emit an interactive figure (drag points, hover,
+                        selection; needs the runtime module at --runtime-url)
+  --runtime-url <url>   URL of the interactive runtime module
+                        (default: ${DEFAULT_RUNTIME_URL})
+  --inline              embed the runtime from --runtime-url (local file,
+                        e.g. dist/geometry-dsl-runtime.js) into the SVG:
+                        fully self-contained, opens from file://
   -h, --help            show this help
 `;
 
@@ -41,6 +49,15 @@ function parseArgs(argv) {
             case "--padding":
                 options.padding = requireNumber(argv, ++i, arg);
                 break;
+            case "--interactive":
+                options.interactive = true;
+                break;
+            case "--runtime-url":
+                options.runtimeUrl = requireValue(argv, ++i, arg);
+                break;
+            case "--inline":
+                options.inline = true;
+                break;
             default:
                 if (arg.startsWith("-")) {
                     throw new Error(`unknown option "${arg}"`);
@@ -63,6 +80,17 @@ function requireNumber(argv, i, flag) {
         throw new Error(`option ${flag} requires a non-negative number, got "${raw}"`);
     }
     return value;
+}
+
+/** --inline: load the runtime source from a local file path */
+function readRuntimeSource(url) {
+    try {
+        return fs.readFileSync(url, "utf8");
+    } catch (error) {
+        throw new Error(
+            `--inline requires --runtime-url to be a readable local file, got "${url}": ${error.message}`,
+        );
+    }
 }
 
 function main() {
@@ -101,7 +129,17 @@ function main() {
             height: options.height,
             padding: options.padding,
         });
-        svg = renderSVG(document);
+        const interactiveOptions = options.interactive
+            ? {
+                  interactive: {
+                      runtimeUrl: options.runtimeUrl,
+                      ...(options.inline
+                          ? { runtimeSource: readRuntimeSource(options.runtimeUrl) }
+                          : {}),
+                  },
+              }
+            : {};
+        svg = renderSVG(document, interactiveOptions);
     } catch (error) {
         process.stderr.write(formatError(error, source) + "\n");
         process.exit(1);

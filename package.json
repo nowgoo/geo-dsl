@@ -1,6 +1,6 @@
 {
   "name": "geometry-dsl",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "A declarative DSL for 2D geometry diagrams that compiles to SVG",
   "type": "module",
   "bin": {
@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "node --test",
-    "cli": "node ./cli/geometry.js"
+    "cli": "node ./cli/geometry.js",
+    "bundle-runtime": "node scripts/bundle-runtime.mjs"
   },
   "engines": {
     "node": ">=22"

@@ -135,6 +135,11 @@ define("mid", {
             returns: "Point",
             build: (a, ctx) => {
                 const seg = geo(a[0], ctx);
+                if (seg.type === "RefDefinition") {
+                    // materialized segment object: engine unwraps endpoints at
+                    // eval time (mirrors LineDefinition fromSegmentRef, plan fix)
+                    return { type: "MidpointDefinition", a: seg, b: null, fromSegmentRef: true, position: a[0].position };
+                }
                 return { type: "MidpointDefinition", a: seg.a, b: seg.b, position: a[0].position };
             },
         },
@@ -194,6 +199,9 @@ define("perpendicular_bisector", {
             returns: "Line",
             build: (a, ctx) => {
                 const seg = geo(a[0], ctx);
+                if (seg.type === "RefDefinition") {
+                    return { type: "PerpendicularBisectorDefinition", a: seg, b: null, fromSegmentRef: true, position: a[0].position };
+                }
                 return { type: "PerpendicularBisectorDefinition", a: seg.a, b: seg.b, position: a[0].position };
             },
         },

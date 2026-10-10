@@ -9,9 +9,19 @@ export { lex } from "./lexer/lexer.js";
 export { parse } from "./parser/parser.js";
 export { analyze } from "./semantic/analyzer.js";
 export { compile } from "./compiler.js";
-export { renderSVG } from "./render/svg/renderer.js";
+export { renderSVG, renderInnerSVG, DEFAULT_RUNTIME_URL } from "./render/svg/renderer.js";
 export { evaluate } from "./engine/evaluate.js";
-export { layout } from "./layout/viewport.js";
+export { layout, toWorld } from "./layout/viewport.js";
+export { toScreen } from "./render/svg/geometry.js";
+
+// v0.3 interactive SVG (spec_v0.3 §6)
+export { serializeDocument, documentToPayload, documentFromPayload } from "./ir/serialize.js";
+export {
+    createInteractiveDocument,
+    hitTest,
+    createSession,
+} from "./interactive/core.js";
+export { mount, mountAll } from "./interactive/runtime.js";
 
 export {
     GeometryDSLError,

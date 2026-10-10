@@ -25,7 +25,7 @@ import { ConstraintErrorDSLError } from "../errors.js";
 /** deterministic multistart count (plan D11) */
 const STARTS = 8;
 
-export function solveConstraints(document) {
+export function solveConstraints(document, options = {}) {
     const { unknowns, fixedNames, dependentNames } = analyzeUnknownStructure(document);
     const constraints = document.constraints;
     const n = unknowns.length * 2;
@@ -48,12 +48,22 @@ export function solveConstraints(document) {
         return constraints.map((constraint) => scaledResidual(constraint, document));
     };
 
-    // 2. deterministic multistart (docs/solver_notes.md §4)
+    // 2. deterministic multistart (docs/solver_notes.md §4);
+    // start 0 can be warm-started from dragged positions (spec_v0.3 §5.5, M5)
+    const warm = options.warmStart ?? null; // Map name -> {x, y}
     const rng = mulberry32(fnv1a(unknowns.join("|")));
     let best = null;
     for (let start = 0; start < STARTS; start++) {
         const x0 = new Array(n).fill(0);
-        if (start > 0) {
+        if (start === 0 && warm) {
+            for (let i = 0; i < unknowns.length; i++) {
+                const p = warm.get(unknowns[i]);
+                if (p) {
+                    x0[2 * i] = p.x;
+                    x0[2 * i + 1] = p.y;
+                }
+            }
+        } else if (start > 0) {
             for (let i = 0; i < n; i++) {
                 x0[i] = (rng() * 2 - 1) * spread;
             }

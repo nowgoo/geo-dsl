@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="480" viewBox="0 0 600 480">
+<polygon points="109.793186,301.817214 490.206814,301.817214 204.896593,64.058697" fill="none" stroke="none"/>
+<circle cx="300" cy="240" r="200" fill="none" stroke="#888888" stroke-width="1.5"/>
+<circle cx="242.341542" cy="212.077609" r="89.739606" fill="none" stroke="#4a90d9" stroke-width="1.5"/>
+<line x1="109.793186" y1="301.817214" x2="347.551703" y2="182.937956" stroke="#aaaaaa" stroke-width="1"/>
+<polygon points="109.793186,301.817214 490.206814,301.817214 204.896593,64.058697" fill="none" stroke="#222222" stroke-width="2"/>
+<circle cx="109.793186" cy="301.817214" r="4" fill="#222222"/>
+<circle cx="490.206814" cy="301.817214" r="4" fill="#222222"/>
+<circle cx="204.896593" cy="64.058697" r="4" fill="#222222"/>
+<circle cx="268.298864" cy="222.564375" r="4" fill="#222222"/>
+<circle cx="300" cy="240" r="4" fill="#222222"/>
+<circle cx="242.341542" cy="212.077609" r="4" fill="#222222"/>
+<circle cx="347.551703" cy="182.937956" r="4" fill="#222222"/>
+<text x="117.793186" y="293.817214" font-family="serif" font-style="italic" font-size="14" fill="#222222">A</text>
+<text x="498.206814" y="293.817214" font-family="serif" font-style="italic" font-size="14" fill="#222222">B</text>
+<text x="212.896593" y="56.058697" font-family="serif" font-style="italic" font-size="14" fill="#222222">C</text>
+<text x="276.298864" y="214.564375" font-family="serif" font-style="italic" font-size="14" fill="#222222">G</text>
+<text x="308" y="232" font-family="serif" font-style="italic" font-size="14" fill="#222222">O</text>
+<text x="250.341542" y="204.077609" font-family="serif" font-style="italic" font-size="14" fill="#222222">I</text>
+</svg>

@@ -1,0 +1,175 @@
+#!/usr/bin/env node
+/**
+ * Runtime bundler (spec_v0.3 §9 / dev_plan_v0.3 D3, P2 experiment).
+ *
+ * Concatenates the interactive runtime's acyclic ESM module graph into a
+ * single plain-script file usable in two ways:
+ *   1. embedded: `geometry render x.geo --interactive --runtime-url <file> --inline`
+ *      (self-contained SVG, opens from file://)
+ *   2. served:   UMD-style — sets window.GeometryDSLInteractive / module.exports
+ *
+ * Deliberately NOT a general bundler (§45/§68): line-anchored transforms
+ * over our own uniform source style, loud failure on anything unexpected
+ * (cycles, default exports, unsupported syntax).
+ *
+ * Usage: node scripts/bundle-runtime.mjs [outfile]   (default dist/geometry-dsl-runtime.js)
+ */
+
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ENTRY = "src/interactive/runtime.js";
+const GLOBAL_NAME = "GeometryDSLInteractive";
+
+export function bundleRuntime(rootDir = process.cwd()) {
+    const modules = new Map(); // id -> { deps: [id], source, names: [exported] }
+
+    function collect(file) {
+        const abs = path.resolve(rootDir, file);
+        const id = toId(abs);
+        if (modules.has(id)) return;
+        const source = fs.readFileSync(abs, "utf8");
+        const deps = [];
+
+        // import lines: `import { a, b as c } from "./x.js";` / `import d from "..."`.
+        // Multi-line named imports are joined first (our style keeps them on one
+        // line, but the sort in renderer.js spans lines — normalize defensively).
+        const flat = source.replace(
+            /^import\s+[^'"]*?from\s+(['"])(\.[^'"]+)\1;?[ \t]*$/gm,
+            (line) => line.replace(/\s*\n\s*/g, " "),
+        );
+        let worked = flat;
+        for (const m of flat.matchAll(/^import\s+(?:([^'"]+?)\s+from\s+)?(['"])(\.[^'"]+)\2;?[ \t]*$/gm)) {
+            const clause = m[1]?.trim() ?? "";
+            const rel = m[3];
+            const depAbs = path.resolve(path.dirname(abs), rel);
+            if (!fs.existsSync(depAbs)) {
+                throw new Error(`bundle: missing module ${rel} (imported by ${file})`);
+            }
+            deps.push(toId(depAbs));
+            collect(depAbs);
+
+            if (clause) {
+                if (!clause.startsWith("{")) {
+                    throw new Error(`bundle: default imports unsupported in ${file}: ${clause}`);
+                }
+                // `import { renderSceneChildren } from ...` -> destructured local
+                const names = clause
+                    .slice(1, -1)
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                // `X as Y` -> `X: Y` (equivalent destructure; avoids the
+                // script-goal `as` parsing quirk in embedded/plain contexts)
+                const decl =
+                    `const { ${names
+                        .map((n) => n.replace(/^(\w+)\s+as\s+(\w+)$/, "$1: $2"))
+                        .join(", ")} } = __load(${JSON.stringify(toId(depAbs))});`;
+                worked = worked.replace(m[0], decl);
+            } else {
+                // side-effect import: inline a load call
+                worked = worked.replace(m[0], `__load(${JSON.stringify(toId(depAbs))});`);
+            }
+        }
+
+        // collect + strip exports
+        const names = [];
+        worked = worked.replace(/^export\s+(function|class)\s+(\w+)/gm, (_, kind, name) => {
+            names.push(name);
+            return `${kind} ${name}`;
+        });
+        worked = worked.replace(/^export\s+(const|let|var)\s+(\w+)/gm, (_, kind, name) => {
+            names.push(name);
+            return `${kind} ${name}`;
+        });
+        worked = worked.replace(/^export\s*\{([^}]*)\};?[ \t]*$/gm, (_, list) => {
+            for (const n of list.split(",").map((s) => s.trim()).filter(Boolean)) names.push(n);
+            return "";
+        });
+        if (/^export\b/m.test(worked)) {
+            throw new Error(`bundle: unsupported export form in ${file}`);
+        }
+
+        modules.set(id, { id, deps, source: worked, names });
+    }
+
+    collect(ENTRY);
+
+    // cycle check + topo order (deps first)
+    const order = [];
+    const state = new Map(); // id -> 1 visiting | 2 done
+    function visit(id, stack) {
+        if (state.get(id) === 2) return;
+        if (state.get(id) === 1) {
+            throw new Error(`bundle: import cycle detected: ${[...stack, id].join(" -> ")}`);
+        }
+        state.set(id, 1);
+        for (const dep of modules.get(id).deps) visit(dep, [...stack, id]);
+        state.set(id, 2);
+        order.push(id);
+    }
+    for (const id of modules.keys()) {
+        // modules keys are ids after collect(); iterate a copy defensively
+        visit(id, []);
+    }
+
+    // emit
+    const parts = [];
+    parts.push(`/*! geometry-dsl interactive runtime — GENERATED by scripts/bundle-runtime.mjs, do not edit */`);
+    parts.push(`(function (root, factory) {`);
+    parts.push(`    if (typeof module === "object" && module.exports) module.exports = factory();`);
+    parts.push(`    else root[${JSON.stringify(GLOBAL_NAME)}] = factory();`);
+    parts.push(`})(typeof globalThis !== "undefined" ? globalThis : this, function () {`);
+    parts.push(`    var __modules = Object.create(null);`);
+    parts.push(`    var __cache = Object.create(null);`);
+    parts.push(`    function __load(id) {`);
+    parts.push(`        if (__cache[id]) return __cache[id];`);
+    parts.push(`        var m = __modules[id];`);
+    parts.push(`        if (!m) throw new Error("bundle: unknown module " + id);`);
+    parts.push(`        var exports = {};`);
+    parts.push(`        __cache[id] = exports;`);
+    parts.push(`        m.factory(exports, __load);`);
+    parts.push(`        return exports;`);
+    parts.push(`    }`);
+    for (const id of order) {
+        const m = modules.get(id);
+        parts.push(`    __modules[${JSON.stringify(id)}] = {`);
+        parts.push(`        factory: function (exports, __load) {`);
+        parts.push(indent(m.source, 2));
+        parts.push(`            Object.assign(exports, { ${m.names.join(", ")} });`);
+        parts.push(`        }`);
+        parts.push(`    };`);
+    }
+    parts.push(`    return __load(${JSON.stringify(toId(path.resolve(rootDir, ENTRY)))});`);
+    parts.push(`});`);
+    return parts.join("\n");
+}
+
+function toId(abs) {
+    // package-root-relative id (stable, readable in stack traces)
+    const rel = path
+        .relative(path.resolve(process.cwd()), abs)
+        .split(path.sep)
+        .join("/");
+    return rel.startsWith("..") ? abs : rel;
+}
+
+function indent(text, levels) {
+    const pad = "    ".repeat(levels);
+    return text
+        .split("\n")
+        .map((line) => (line.trim() ? pad + line : line))
+        .join("\n");
+}
+
+// CLI entry
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+    const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+    const out = process.argv[2] ?? path.join(rootDir, "dist", "geometry-dsl-runtime.js");
+    const code = bundleRuntime(rootDir);
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    fs.writeFileSync(out, code + "\n");
+    process.stdout.write(`wrote ${out} (${code.length} bytes)\n`);
+}

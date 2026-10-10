@@ -114,6 +114,10 @@ export function evalDefinition(def, document, objectName = "?") {
                 );
             }
         case "MidpointDefinition":
+            if (def.fromSegmentRef) {
+                const seg = refGeometry(def.a, document);
+                return midpoint(seg.a, seg.b);
+            }
             return midpoint(evalPoint(def.a, document), evalPoint(def.b, document));
         case "IntersectionDefinition":
             return evalIntersection(def, document);
@@ -122,6 +126,10 @@ export function evalDefinition(def, document, objectName = "?") {
         case "ParallelDefinition":
             return parallelThrough(evalPoint(def.point, document), evalLineLike(def.line, document));
         case "PerpendicularBisectorDefinition":
+            if (def.fromSegmentRef) {
+                const seg = refGeometry(def.a, document);
+                return perpendicularBisector(seg.a, seg.b);
+            }
             return perpendicularBisector(evalPoint(def.a, document), evalPoint(def.b, document));
         case "AngleBisectorDefinition":
             return angleBisector(

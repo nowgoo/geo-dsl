@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="geo-interactive" width="520" height="400" viewBox="0 0 520 400">
+<g class="geo-scene">
+<g class="geo-obj" data-geo-name="ABC" data-geo-kind="Polygon"><title>ABC · polygon (3 vertices)</title><polygon points="40,279.880282 480,279.880282 328.75,120.119718" fill="none" stroke="none"/></g>
+<g class="geo-obj" data-geo-name="ABC" data-geo-kind="Polygon"><title>ABC · polygon (3 vertices)</title><polygon points="40,279.880282 480,279.880282 328.75,120.119718" fill="none" stroke="#222222" stroke-width="2"/></g>
+<g class="geo-obj" data-geo-name="A" data-geo-kind="Point"><title>A (0, 0)</title><circle cx="40" cy="279.880282" r="4" fill="#222222"/></g>
+<g class="geo-obj" data-geo-name="B" data-geo-kind="Point"><title>B (4, 0)</title><circle cx="480" cy="279.880282" r="4" fill="#222222"/></g>
+<g class="geo-obj" data-geo-name="C" data-geo-kind="Point"><title>C (2.625, 1.452369)</title><circle cx="328.75" cy="120.119718" r="4" fill="#222222"/></g>
+<g data-geo-label="A"><text x="48" y="271.880282" font-family="serif" font-style="italic" font-size="14" fill="#222222">A</text></g>
+<g data-geo-label="B"><text x="488" y="271.880282" font-family="serif" font-style="italic" font-size="14" fill="#222222">B</text></g>
+<g data-geo-label="C"><text x="336.75" y="112.119718" font-family="serif" font-style="italic" font-size="14" fill="#222222">C</text></g>
+</g>
+<style>
+.geo-interactive{touch-action:none;user-select:none}
+.geo-obj{cursor:pointer}
+.geo-obj[data-geo-kind="Point"]{cursor:grab}
+.geo-interactive.is-dragging .geo-obj[data-geo-kind="Point"]{cursor:grabbing}
+.geo-obj:hover{filter:drop-shadow(0 0 3px #4a90d9)}
+.geo-obj.is-selected{filter:drop-shadow(0 0 4px #4a90d9)}
+g[data-geo-label]{cursor:move}
+.geo-interactive.is-error .geo-scene{filter:drop-shadow(0 0 4px #d94a4a)}
+</style>
+<script type="application/json" class="geo-payload">{"version":1,"mode":"solve","canvas":{"width":520,"height":400,"padding":40},"transform":{"scale":110,"ox":40,"oy":279.8802815981239},"objects":[{"name":"A","kind":"Point","definition":{"type":"PointLiteralDefinition","x":{"type":"NumberExpr","value":0},"y":{"type":"NumberExpr","value":0}},"dependencies":[],"draggable":true,"unknown":false,"solved":null},{"name":"B","kind":"Point","definition":{"type":"PointLiteralDefinition","x":{"type":"NumberExpr","value":4},"y":{"type":"NumberExpr","value":0}},"dependencies":[],"draggable":true,"unknown":false,"solved":null},{"name":"C","kind":"Point","definition":{"type":"UnknownPointDefinition"},"dependencies":[],"draggable":true,"unknown":true,"solved":[2.6249999992889608,1.4523687563295251]},{"name":"ABC","kind":"Polygon","definition":{"type":"PolygonDefinition","points":[{"type":"RefDefinition","name":"A"},{"type":"RefDefinition","name":"B"},{"type":"RefDefinition","name":"C"}]},"dependencies":["A","B","C"],"draggable":false,"unknown":false,"solved":null}],"styles":{},"labels":[{"target":"A","text":"A","offset":{"x":8,"y":-8}},{"target":"B","text":"B","offset":{"x":8,"y":-8}},{"target":"C","text":"C","offset":{"x":8,"y":-8}}],"marks":[],"constraints":[{"kind":"number_equality","lhs":{"type":"LengthCall","target":{"type":"SegmentDefinition","a":{"type":"RefDefinition","name":"A"},"b":{"type":"RefDefinition","name":"C"}}},"rhs":{"type":"NumberExpr","value":3},"source":"AC = 3"},{"kind":"number_equality","lhs":{"type":"LengthCall","target":{"type":"SegmentDefinition","a":{"type":"RefDefinition","name":"B"},"b":{"type":"RefDefinition","name":"C"}}},"rhs":{"type":"NumberExpr","value":2},"source":"BC = 2"}]}</script>
+<script type="module" class="geo-bootstrap">import { mountAll } from "./geometry-dsl-runtime.js";
+mountAll(document);</script>
+</svg>

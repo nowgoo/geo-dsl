@@ -1,6 +1,7 @@
 # Geometry DSL v0.2 — 语言参考
 
 正文说明与 `docs/spec_v0.1.1.md`（v0.1.1 部分）及 `docs/spec_v0.2.md`（约束部分）的章节号以方括号对应。
+交互式 SVG 见文末 [spec_v0.3] 一节。
 
 ## 程序结构
 
@@ -171,3 +172,39 @@ angle(B,A,C) = 2*angle(A,B,C)   /* 角度等式，可写一般数值式 */
 
 引擎使用数学笛卡尔坐标（+Y 向上）。SVG 的 Y 翻转只在渲染器中应用。
 画布单位为像素；视口按等比缩放容纳所有几何，居中并保持宽高比 [§32]。
+
+## 交互式 SVG [spec_v0.3]
+
+语言本身零改动；交互是渲染选项。静态输出（单参 `renderSVG(document)`）与
+v0.2 逐字节一致，交互完全 opt-in。
+
+```js
+import { compile, renderSVG, mountAll } from "geometry-dsl";
+
+const svg = renderSVG(compile(source), {
+    interactive: { runtimeUrl: "./geometry-dsl-runtime.js" },
+});
+// 浏览器端（或静态站点加载 runtime 后）：
+mountAll(document);
+```
+
+CLI：
+
+```bash
+geometry render input.geo --interactive [--runtime-url URL]
+```
+
+交互能力 [spec_v0.3 §5]：
+
+- **拖拽自由点**：字面定义点（`A = (1, 2)`）可直接拖动；派生对象
+  （中点、交点、外接圆…）实时跟随（浏览器端复用 `evaluate()` 重算）。
+  拖拽期间视口冻结，松开后重新自动布局。
+- **拖拽 label**：仅客户端偏移，不回写源码。
+- **hover**：对象高亮 + 原生 `<title>` 提示（点坐标、线段长度、圆半径）。
+- **选中**：点击命中（点 > 线 > 多边形内部），高亮框由纯 CSS 实现。
+- **约束联动**：断言模式文档拖拽违反约束时回滚；求解模式文档拖拽
+  未知点会以拖拽位置为 warm-start 重解（失败同样回滚）。
+
+交付形态：单文件 SVG 内嵌 payload JSON + bootstrap，运行时模块由
+`--runtime-url` 加载（文档站点加载一次全站共用）。`scripts/bundle-runtime.mjs`
+可产出单文件内联版（双击 file:// 直开）。运行时加载失败时图形保持静态。
