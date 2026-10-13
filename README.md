@@ -60,6 +60,7 @@ const svg = renderSVG(document);
 | `label A "text"` | 点标签（自定义文本 / 偏移） |
 | `mark right_angle(A, B, C)` | 在 B 处的直角方块标记 |
 | `style AB { stroke: #f00 }` | 按对象的样式 |
+| `hide A, AB, omega` | 隐藏对象（不渲染，仍参与几何计算） |
 | `canvas { width: 600 height: 400 padding: 30 }` | 视口 |
 
 完整参考：[docs/language.md](docs/language.md)。

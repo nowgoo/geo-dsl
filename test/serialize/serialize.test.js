@@ -118,6 +118,24 @@ test("draggable flags: literal points true, derived false", () => {
     assert.equal(byName.G.draggable, false);
 });
 
+test("hide: payload omits hidden field when false, carries true when hidden", () => {
+    const plain = documentToPayload(compile("A = (0,0)\nB = (6,0)\nAB"));
+    assert.ok(!("hidden" in plain.objects[0]), "hidden should be omitted when false");
+
+    const payload = documentToPayload(
+        compile("A = (0,0)\nB = (6,0)\nAB\nhide B, AB"),
+    );
+    const byName = Object.fromEntries(payload.objects.map((o) => [o.name, o]));
+    assert.equal(byName.B.hidden, true);
+    assert.equal(byName.AB.hidden, true);
+    assert.ok(!("hidden" in byName.A), "non-hidden object omits hidden field");
+
+    const restored = documentFromPayload(payload);
+    assert.equal(restored.objects.get("B").hidden, true);
+    assert.equal(restored.objects.get("AB").hidden, true);
+    assert.equal(restored.objects.get("A").hidden, false);
+});
+
 test("mode: free / assert / solve", () => {
     assert.equal(documentToPayload(compile("A = (0,0)\nB = (4,0)\nAB")).mode, "free");
     assert.equal(documentToPayload(compile("A = (0,0)\nB = (4,0)\nC = (2,3)\nD = (6,3)\nAB // CD")).mode, "assert");

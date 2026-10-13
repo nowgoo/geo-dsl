@@ -42,7 +42,7 @@ export function documentToPayload(document) {
     const objects = [];
     for (const object of document.objects.values()) {
         const unknown = object.definition.type === "UnknownPointDefinition";
-        objects.push({
+        const entry = {
             name: object.name,
             kind: object.kind,
             definition: stripPosition(object.definition),
@@ -52,7 +52,10 @@ export function documentToPayload(document) {
                 object.definition.type === "PointLiteralDefinition" || unknown,
             unknown,
             solved: unknown && object.geometry ? [object.geometry.x, object.geometry.y] : null,
-        });
+        };
+        // `hide` statement: only serialize when true so payload stays stable (§ hide)
+        if (object.hidden) entry.hidden = true;
+        objects.push(entry);
     }
 
     const styles = {};
@@ -122,6 +125,7 @@ export function documentFromPayload(payload) {
             dependencies: entry.dependencies ?? [],
             position: null,
         });
+        object.hidden = entry.hidden ?? false;
         if (entry.unknown && entry.solved) {
             object.geometry = new Point(entry.solved[0], entry.solved[1]);
         }

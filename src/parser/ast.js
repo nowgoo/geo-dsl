@@ -201,6 +201,14 @@ export class MarkStmt {
     }
 }
 
+export class HideStmt {
+    constructor(targets, position) {
+        this.type = "HideStmt";
+        this.targets = targets; // array of PointRefExpr | SegmentRefExpr | PolygonRefExpr | IdentifierExpr
+        this.position = position;
+    }
+}
+
 export class Program {
     constructor(statements) {
         this.type = "Program";

@@ -61,6 +61,7 @@ export function hitTest(doc, svgPoint, { labelOffsets = null } = {}) {
     // labels (top-most): resolved position + resolved offset + client drag offset
     for (const label of doc.labels) {
         if (!label.resolved) continue;
+        if (doc.objects.get(label.target.name)?.hidden) continue;
         const s = toScreen(t, { x: label.resolved.x, y: label.resolved.y });
         const drag = labelOffsets?.get(label.target.name) ?? { x: 0, y: 0 };
         const d = Math.hypot(s.x + label.resolved.offset.x + drag.x - svgPoint.x,
@@ -71,6 +72,7 @@ export function hitTest(doc, svgPoint, { labelOffsets = null } = {}) {
     }
 
     for (const object of doc.objects.values()) {
+        if (object.hidden) continue;
         const g = object.geometry;
         if (!g) continue;
         if (g.type === "Point") {
@@ -85,6 +87,7 @@ export function hitTest(doc, svgPoint, { labelOffsets = null } = {}) {
     // strokes: nearest among all stroked objects
     let bestStroke = null;
     for (const object of doc.objects.values()) {
+        if (object.hidden) continue;
         const d = strokeDistance(object, t, svgPoint);
         if (d !== null && d <= HIT.STROKE_RADIUS_PX) {
             if (!bestStroke || d < bestStroke.distance) {
@@ -96,6 +99,7 @@ export function hitTest(doc, svgPoint, { labelOffsets = null } = {}) {
 
     // polygon fills (lowest priority): first (in document order) containing point
     for (const object of doc.objects.values()) {
+        if (object.hidden) continue;
         const g = object.geometry;
         if (g?.type === "Polygon" && pointInPolygon(g.points, svgPoint, t)) {
             candidates.push({ kind: "fill", name: object.name, distance: 0 });

@@ -413,6 +413,76 @@ label B offset (0, 0)
     assert.deepEqual(doc.labels[1].offset, { x: 0, y: 0 });
 });
 
+test("semantic: hide marks objects hidden (point / segment / polygon / named object)", () => {
+    const doc = compile(`
+A = (0,0)
+B = (8,0)
+C = (3,5)
+ABC
+D = mid(BC)
+omega = circumcircle(ABC)
+hide D, omega, ABC
+`);
+    assert.equal(doc.objects.get("D").hidden, true);
+    assert.equal(doc.objects.get("omega").hidden, true);
+    assert.equal(doc.objects.get("ABC").hidden, true);
+    assert.equal(doc.objects.get("A").hidden, false);
+    assert.equal(doc.objects.get("B").hidden, false);
+    assert.equal(doc.objects.get("C").hidden, false);
+});
+
+test("semantic: hide materializes implicit segment/polygon refs", () => {
+    const doc = compile(`
+A = (0,0)
+B = (8,0)
+C = (3,5)
+hide AB
+hide ACB
+`);
+    assert.equal(doc.objects.get("AB").hidden, true);
+    assert.equal(doc.objects.get("AB").kind, "Segment");
+    assert.equal(doc.objects.get("ACB").hidden, true);
+    assert.equal(doc.objects.get("ACB").kind, "Polygon");
+});
+
+test("semantic: hide undefined object -> NameError", () => {
+    expectError(`
+A = (0,0)
+hide Q
+`, "NameError", /undefined object "Q"/);
+    expectError(`
+hide AB
+`, "NameError", /undefined point "A"/); // AB materialization requires its points
+});
+
+test("semantic: hide hidden objects still evaluate and keep dependencies", () => {
+    const doc = compile(`
+A = (0,0)
+B = (8,0)
+C = (3,5)
+D = mid(BC)
+AD
+hide D, AD
+`);
+    const d = doc.objects.get("D");
+    assert.equal(d.hidden, true);
+    assert.deepEqual(d.dependencies, ["B", "C"]);
+    const ad = doc.objects.get("AD");
+    assert.equal(ad.hidden, true);
+    assert.deepEqual(ad.dependencies, ["A", "D"]);
+});
+
+test("semantic: hide order does not matter", () => {
+    const doc = compile(`
+hide D
+A = (0,0)
+B = (8,0)
+C = (3,5)
+D = mid(BC)
+`);
+    assert.equal(doc.objects.get("D").hidden, true);
+});
+
 test("semantic: mark kinds and arities", () => {
     expectError(`
 A = (0,0)

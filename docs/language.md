@@ -19,6 +19,7 @@ G = AD * BE         // 交点
 label A             // 标注
 mark right_angle(A, B, C)
 style segment { stroke: #333 }
+hide D, AD          // 隐藏对象（不渲染，仍参与几何计算）
 ```
 
 注释为 C 风格块注释 `/* ... */`，不支持嵌套。
@@ -123,6 +124,25 @@ mark equal_length(AB, CD)      /* 刻度线 */
 mark parallel(AB, CD)          /* 箭头雪佛龙 */
 mark equal_angle(A,B,C,D,E,F)  /* 在 B 和 E 处配对的弧 */
 ```
+
+## 隐藏对象
+
+`hide` 隐藏一个或多个对象，使其不渲染；被隐藏对象仍参与几何计算
+（求值、布局、依赖），只是不绘制。常用于隐藏辅助构造线/点：
+
+```geometry
+hide D
+hide D, AD, omega         /* 一行隐藏多个对象，逗号分隔 */
+hide AB                    /* 隐式线段引用也会被隐藏 */
+hide ABC                   /* 隐式多边形引用 */
+hide omega                 /* 命名对象 */
+```
+
+- 目标可以是点（`A`）、线段（`AB`）、多边形（`ABC`）或任意命名对象
+  （`omega`、`h`）。
+- 未定义的对象 → NameError；隐式引用（`AB`/`ABC`）要求其顶点存在。
+- 隐藏点的标注（label）也被抑制；标记（mark）不受影响。
+- 交互模式下隐藏对象不可选中/拖拽，重新渲染后仍然隐藏。
 
 ## 约束 [spec_v0.2 §3–§4]
 

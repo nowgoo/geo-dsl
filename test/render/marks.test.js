@@ -172,3 +172,69 @@ label A "renamed"
     assert.equal(doc.labels[0].text, "renamed");
     assert.deepEqual(doc.labels[0].offset, { x: 8, y: -8 });
 });
+
+test("hide: hidden objects are not rendered", () => {
+    const svg = renderSVG(compile(`${BASE}
+D = mid(BC)
+AD
+hide D, AD
+`), { interactive: { runtimeUrl: "./x.js" } });
+    // D's marker and AD's segment line are gone
+    assert.ok(!svg.includes(`data-geo-name="D"`), "hidden point should not render");
+    assert.ok(!svg.includes(`data-geo-name="AD"`), "hidden segment should not render");
+    // visible geometry still renders: A, B, C points and ABC polygon
+    assert.ok(svg.includes(`data-geo-name="A"`));
+    assert.ok(svg.includes(`data-geo-name="ABC"`));
+});
+
+test("hide: label of hidden point is suppressed", () => {
+    const svg = renderSVG(compile(`
+A = (0, 0)
+B = (4, 0)
+C = (0, 3)
+D = mid(BC)
+label A
+label D
+hide D
+`), { interactive: { runtimeUrl: "./x.js" } });
+    assert.ok(svg.includes(`data-geo-label="A"`));
+    assert.ok(!svg.includes(`data-geo-label="D"`), "label of hidden point should be suppressed");
+});
+
+test("hide: multiple objects in one statement are all hidden", () => {
+    const svg = renderSVG(compile(`${BASE}
+D = mid(BC)
+E = mid(CA)
+hide D, E, AB, AC
+`), { interactive: { runtimeUrl: "./x.js" } });
+    for (const name of ["D", "E", "AB", "AC"]) {
+        assert.ok(!svg.includes(`data-geo-name="${name}"`), `hidden object should not render: ${name}`);
+    }
+    assert.ok(svg.includes(`data-geo-name="C"`));
+    assert.ok(svg.includes(`data-geo-name="ABC"`));
+});
+
+test("hide: hidden objects still participate in layout/evaluation", () => {
+    const doc = compile(`
+A = (0, 0)
+B = (100, 0)
+C = (0, 100)
+D = mid(BC)
+hide D
+`);
+    // D still evaluates
+    const d = doc.objects.get("D");
+    assert.ok(d.geometry, "hidden object must still evaluate");
+    assert.ok(Math.abs(d.geometry.x - 50) < 1e-9 && Math.abs(d.geometry.y - 50) < 1e-9);
+});
+
+test("hide: hidden objects not in interactive payload scene re-render", () => {
+    const svg = renderSVG(compile(`${BASE}
+hide AB
+`), { interactive: { runtimeUrl: "./x.js" } });
+    // payload records hidden, scene omits the element
+    assert.match(svg, /"name":"AB","kind":"Segment".*"hidden":true/);
+    assert.ok(!svg.includes(`data-geo-name="AB"`), "interactive scene should skip hidden objects");
+    assert.ok(svg.includes(`data-geo-name="ABC"`));
+});
+

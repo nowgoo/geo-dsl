@@ -12,6 +12,7 @@ export class GeometryObject {
         this.position = position; // source position for runtime error reporting
         this.geometry = null; // filled by evaluation
         this.style = null; // resolved style overrides
+        this.hidden = false; // `hide` statement: not rendered, still evaluated/laid out
     }
 }
 

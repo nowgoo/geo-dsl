@@ -67,6 +67,7 @@ class Analyzer {
         this.resolving = new Set(); // cycle detection during kind inference
 
         this.pendingBareRefs = []; // GeometryRefStmt list (existence validated later)
+        this.pendingHides = []; // HideStmt list
         this.pendingLabels = [];
         this.styleStatements = [];
         this.pendingCanvas = null;
@@ -97,6 +98,9 @@ class Analyzer {
                     break;
                 case "StyleStmt":
                     this.styleStatements.push(stmt);
+                    break;
+                case "HideStmt":
+                    this.collectHide(stmt);
                     break;
                 case "LabelStmt":
                     this.pendingLabels.push(stmt);
@@ -207,6 +211,35 @@ class Analyzer {
         this.document.objects.set(name, object);
     }
 
+    /** hide targets: points, segments/polygons (implicit refs) and named objects */
+    collectHide(stmt) {
+        for (const target of stmt.targets) {
+            if (target.type === "SegmentRefExpr" || target.type === "PolygonRefExpr") {
+                // materialize the implicit object so it exists (idempotent, like a bare ref)
+                const name = target.type === "SegmentRefExpr"
+                    ? `${target.from}${target.to}`
+                    : target.points.join("");
+                if (this.document.objects.has(name) && !this.document.objects.get(name).pending) {
+                    continue;
+                }
+                if (this.bindings.has(name)) {
+                    continue; // defensive: implicit forms are not assignable
+                }
+                const kind = target.type === "SegmentRefExpr" ? "Segment" : "Polygon";
+                const object = new GeometryObject({
+                    id: name,
+                    name,
+                    kind,
+                    definition: null,
+                    position: stmt.position,
+                });
+                object.pending = true;
+                this.document.objects.set(name, object);
+            }
+        }
+        this.pendingHides.push(stmt);
+    }
+
     // === phase B: resolve / check / canonicalize ==================================
 
     passB() {
@@ -274,6 +307,21 @@ class Analyzer {
                 position: stmt.position,
             });
             this.document.objects.set(name, object);
+        }
+
+        // 4.5 hide statements (targets must exist; implicit refs materialized in collectHide)
+        for (const stmt of this.pendingHides) {
+            for (const target of stmt.targets) {
+                const name = hideTargetName(target);
+                const object = this.document.objects.get(name);
+                if (!object || object.pending) {
+                    throw new NameErrorDSLError(
+                        `hide references undefined object "${name}"`,
+                        stmt.position,
+                    );
+                }
+                object.hidden = true;
+            }
         }
 
         // 5. styles / labels / marks
@@ -945,6 +993,21 @@ class Analyzer {
                     }
             }
         }
+    }
+}
+
+/** canonical object name for a hide target */
+function hideTargetName(target) {
+    switch (target.type) {
+        case "PointRefExpr":
+        case "IdentifierExpr":
+            return target.name;
+        case "SegmentRefExpr":
+            return `${target.from}${target.to}`;
+        case "PolygonRefExpr":
+            return target.points.join("");
+        default:
+            return null;
     }
 }
 

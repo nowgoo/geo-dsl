@@ -289,6 +289,44 @@ test("parser: label comma with no following point is SyntaxError", () => {
     assert.throws(() => ast("label A, B,"), (e) => e.name === "SyntaxError");
 });
 
+test("parser: hide statement forms", () => {
+    const p1 = ast("hide A");
+    assert.equal(p1.statements.length, 1);
+    const s1 = p1.statements[0];
+    assert.equal(s1.type, "HideStmt");
+    assert.equal(s1.targets.length, 1);
+    assert.equal(s1.targets[0].type, "PointRefExpr");
+    assert.equal(s1.targets[0].name, "A");
+
+    // comma-separated multi-object hide on one line
+    const p2 = ast("hide A, B, AB, omega, ABC");
+    assert.equal(p2.statements.length, 1);
+    const s2 = p2.statements[0];
+    assert.equal(s2.type, "HideStmt");
+    assert.deepEqual(
+        s2.targets.map((t) => t.type),
+        ["PointRefExpr", "PointRefExpr", "SegmentRefExpr", "IdentifierExpr", "PolygonRefExpr"],
+    );
+    assert.equal(s2.targets[2].from, "A");
+    assert.equal(s2.targets[2].to, "B");
+    assert.equal(s2.targets[3].name, "omega");
+    assert.deepEqual(s2.targets[4].points, ["A", "B", "C"]);
+});
+
+test("parser: hide comma with no following object is SyntaxError", () => {
+    assert.throws(() => ast("hide A,"), (e) => e.name === "SyntaxError");
+    assert.throws(() => ast("hide A, B,"), (e) => e.name === "SyntaxError");
+});
+
+test("parser: hide multiple statements coexist", () => {
+    const p = ast("hide A\nhide B, C");
+    assert.equal(p.statements.length, 2);
+    assert.deepEqual(
+        p.statements.flatMap((s) => s.targets.map((t) => t.name)),
+        ["A", "B", "C"],
+    );
+});
+
 test("parser: mark statements", () => {
     const p1 = ast("mark right_angle(A, B, C)");
     assert.equal(p1.statements[0].type, "MarkStmt");

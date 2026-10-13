@@ -108,6 +108,32 @@ test("hitTest: polygon fill hit inside, miss outside", () => {
     assert.equal(hitTest(doc, far), null);
 });
 
+test("hitTest skips hidden objects and hidden-point labels", () => {
+    const { doc } = setup(`
+A = (0, 0)
+B = (6, 0)
+C = (2, 4)
+D = mid(BC)
+AB
+label A
+label D
+hide D, AB
+`);
+    // cursor exactly on hidden point D: no point hit (falls through to other geometry)
+    const d = screenOf(doc, "D");
+    assert.notEqual(hitTest(doc, { x: d.x, y: d.y })?.name, "D");
+    // cursor on hidden segment AB midpoint: no stroke hit
+    const a = screenOf(doc, "A");
+    const b = screenOf(doc, "B");
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    assert.notEqual(hitTest(doc, mid)?.name, "AB");
+    // visible point A still hit-testable; its label is present
+    assert.equal(hitTest(doc, { x: a.x + 2, y: a.y + 2 })?.name, "A");
+    // hidden point D's label is not hit-testable
+    const dLabel = { x: d.x + 8, y: d.y - 8 };
+    assert.notEqual(hitTest(doc, dLabel)?.kind, "label");
+});
+
 test("hitTest respects client label offsets", () => {
     const { doc } = setup("A = (0,0)\nlabel A");
     const s = screenOf(doc, "A");

@@ -19,7 +19,7 @@ const goldenDir = join(root, "test", "render", "golden-interactive");
 const UPDATE = process.env.UPDATE_GOLDEN === "1";
 
 // interactive-mode coverage: marks/labels/points, style overrides, solved unknowns
-const cases = ["right_triangle", "circumcircle", "solve_sss", "styles"];
+const cases = ["right_triangle", "circumcircle", "solve_sss", "styles", "hide"];
 const RUNTIME_URL = "./geometry-dsl-runtime.js";
 
 for (const name of cases) {

@@ -8,6 +8,7 @@
  *   "canvas" "{"         -> canvas statement
  *   "style" selector "{" -> style statement
  *   "label" point-ref    -> label statement
+ *   "hide"  object-refs  -> hide statement
  *   "mark" ident "("     -> mark statement
  *   otherwise            -> expression statement (implicit geometry reference)
  */
@@ -101,6 +102,9 @@ class Parser {
             }
             if (t.text === "label") {
                 return this.parseLabel();
+            }
+            if (t.text === "hide") {
+                return this.parseHide();
             }
             if (
                 t.text === "mark" &&
@@ -343,6 +347,22 @@ class Parser {
             );
         }
         return targetExpr;
+    }
+
+    parseHide() {
+        const kw = this.next(); // "hide"
+        const targets = [this.parseHideTarget()];
+        while (this.checkSymbol(",")) {
+            this.next(); // ","
+            targets.push(this.parseHideTarget());
+        }
+        return new A.HideStmt(targets, pos(kw.position));
+    }
+
+    /** hide target: point name (A), segment (AB), polygon (ABC…) or named object */
+    parseHideTarget() {
+        const t = this.expectIdent("expected object name after hide");
+        return this.classifyIdentifier(t);
     }
 
     parseMark() {

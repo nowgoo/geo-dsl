@@ -72,7 +72,7 @@ export function renderSceneChildren(document, interactive = null) {
     setMarkStyle(markStyle());
 
     const index = buildStyleIndex(document);
-    const objects = [...document.objects.values()];
+    const objects = [...document.objects.values()].filter((o) => !o.hidden);
     const wrap = interactive ? objectWrapper() : null;
 
     const parts = [];
@@ -140,6 +140,8 @@ export function renderSceneChildren(document, interactive = null) {
     // labels
     const lStyle = labelStyle();
     for (const label of document.labels) {
+        // labels of hidden points are suppressed (§ hide)
+        if (document.objects.get(label.target.name)?.hidden) continue;
         const text = renderLabel(document.transform, label, lStyle);
         parts.push(
             interactive
